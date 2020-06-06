@@ -1,0 +1,78 @@
+function order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid){
+  if(position == "Buy"){
+    position = "BUY";
+  }else if(position == "Sell"){
+    position = "SELL";
+  }
+  
+  var lock = LockService.getScriptLock()
+  if (lock.tryLock(10000)) {
+    try {
+      var status = spreadSheet.getSheetByName('order');
+      status.appendRow([time,productcode,price,position,strategy,volume,outstanding,exchange,tid,0]);
+    }catch(e){
+      sendMessage_(e);
+    }finally{
+      lock.releaseLock();
+    }
+  }else{
+    sendMessage_("write order failed because of lock.");
+  }
+}
+
+function order_errorcount_(tid,errorcount){
+  var status = spreadSheet.getSheetByName('order');
+  var data = status.getDataRange().getValues();
+  for(var i=0;i<data.length;i++){
+    if(data[i][8] === tid){
+      data[i][9] = errorcount;
+      status.getRange(i+1,1,1,10).setValues([data[i]]);
+    }
+  }
+}
+
+function order_get_(){
+  var status = spreadSheet.getSheetByName('order');
+  var result = status.getDataRange().getValues();
+  
+  var times = [];
+  var productcodes = [];
+  var prices = [];
+  var positions = [];
+  var strategys = [];
+  var volumes = [];
+  var outstandings = [];
+  var exchanges = [];
+  var ids = [];
+  var errorcounts = [];
+  //ordertableにない場合、終了
+  if (!result){
+    return;
+  }
+
+  for(var i=0;i<result.length;i++){
+    times[i] = result[i][0];
+    productcodes[i] = result[i][1];
+    prices[i] = result[i][2];
+    positions[i] = result[i][3];
+    strategys[i] = result[i][4];
+    volumes[i] = result[i][5];
+    outstandings[i] = result[i][6];
+    exchanges[i] = result[i][7];
+    ids[i] = result[i][8];
+    errorcounts[i] = result[i][9];
+  }
+  return [times,productcodes,prices,positions,strategys,volumes,outstandings,exchanges,ids,errorcounts];
+}
+
+function order_delete_(tid){
+  var status = spreadSheet.getSheetByName('order');
+  var data = status.getDataRange().getValues();
+  for(var i=0;i<data.length;i++){
+    if(data[i][8] === tid){
+      status.deleteRows(i+1);
+      return;
+    }
+  }
+  return;
+}
