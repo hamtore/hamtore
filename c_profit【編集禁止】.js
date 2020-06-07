@@ -32,7 +32,7 @@ function setProfit_() {
     var productcode = result[i][1];
     var price =  Number(result[i][2]);
     var position =  result[i][3];
-    var strategy = result[i][4];
+    var strategy = String(result[i][4]);
     var volume = Number(result[i][5]);
     var exchange = result[i][6];
     var id = result[i][7];
@@ -132,7 +132,7 @@ function getLastTradeInfo_(strategyName){
   var result = [];
   for(var i=1;i<data.length;i++){
     Logger.log(data[i][9]);
-    if(data[i][4] === strategyName && data[i][9] !== ""){//Strategy & averagePrice = ""
+    if(String(data[i][4]) === strategyName && data[i][9] !== ""){//Strategy & averagePrice = ""
       result.push(data[i]);
     }
   }
@@ -151,7 +151,7 @@ function getLastTradeTotalVolume_(strategyName){
   var data = status.getDataRange().getValues();
   var result = [];
   for(var i=1;i<data.length;i++){
-    if(data[i][4] === strategyName && data[i][10] !== ""){//Strategy
+    if(String(data[i][4]) === strategyName && data[i][10] !== ""){//Strategy
       result.push(data[i]);
     }
   }
