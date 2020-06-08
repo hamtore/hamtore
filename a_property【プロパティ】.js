@@ -1,22 +1,26 @@
+// script property
+property = PropertiesService.getScriptProperties();
+
 //TableId
-var spreadSheet = SpreadsheetApp.openById("");//spreadSheet用
+var spreadSheetID = "" || property.getProperty("SPREAD_SHEET_ID");//spreadSheet用
+var spreadSheet = SpreadsheetApp.openById(spreadSheetID);
 
 //Notification
-var LineToken = "";//LINENotify用
-var DiscordUrl = "";//Discord用
-var AlertMailAddress = "";//Alert Mail用(重大エラー通知)
+var LineToken = "" || property.getProperty("LINE_TOKEN");//LINENotify用
+var DiscordUrl = "" || property.getProperty("DISCORD_URL");//Discord用
+var AlertMailAddress = "" || property.getProperty("ALERT_MAIL_ADDRESS");//Alert Mail用(重大エラー通知)
 
 //bitFlyer
-var bitflyer_key = "";//bitflyer_API_key
-var bitflyer_secret = "";//bitflyer_secret_key
+var bitflyer_key = "" || property.getProperty("BITFLYER_KEY");//bitflyer_API_key
+var bitflyer_secret = "" || property.getProperty("BITFLYER_SECRET");//bitflyer_secret_key
 
 //Bybit
-var bybit_key = "";//bybit_API_key
-var bybit_secret = "";//bybit_secret_key
+var bybit_key = "" || property.getProperty("BYBIT_KEY");//bybit_API_key
+var bybit_secret = "" || property.getProperty("BYBIT_SECRET");//bybit_secret_key
 
 //Bybit testnet
-var bybit_testnet_key = "";//bybit_testnet_API_key
-var bybit_testnet_secret = "";//bybit_testnet_secret_key
+var bybit_testnet_key = "" || property.getProperty("BYBIT_TESTNET_KEY");//bybit_testnet_API_key
+var bybit_testnet_secret = "" || property.getProperty("BYBIT_TESTNET_SECRET");//bybit_testnet_secret_key
 
 //Boost Mode
 var BoostMode = "OFF";//ON or OFF
