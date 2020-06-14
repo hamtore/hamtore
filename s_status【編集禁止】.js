@@ -64,7 +64,7 @@ function todoubles_increase_(todoubles,volume,strategy,exchange){
       }
       var status = status_sheet.getDataRange().getValues();
       for(var i=1;i<status.length;i++){
-        if(status[i][0] === strategy){
+        if(String(status[i][0]) === strategy){
           status[i][3] = volume * 2;//Volume
           status[i][5] = "OFF";// ToDoubles
           status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
@@ -88,7 +88,7 @@ function strategy_start_(strategy,exchange){
     }
     var status = status_sheet.getDataRange().getValues();
     for(var i=1;i<status.length;i++){
-      if(status[i][0] === strategy){
+      if(String(status[i][0]) === strategy){
         status[i][1] = "ON"; // Active
         status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
         break;
@@ -110,7 +110,7 @@ function strategy_stop_(strategy,exchange){
     }
     var status = status_sheet.getDataRange().getValues();
     for(var i=1;i<status.length;i++){
-      if(status[i][0] === strategy){
+      if(String(status[i][0]) === strategy){
         status[i][1] = "OFF"; // Active
         status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
         break;

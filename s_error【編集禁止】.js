@@ -47,7 +47,7 @@ function get_error_(strategy,exchange){
 
   var error;
   for(var i=1;i<status.length;i++){
-    if(status[i][0] === strategy){
+    if(String(status[i][0]) === strategy){
       error = status[i][9]; // Error
       break;
     }
@@ -64,7 +64,7 @@ function order_error_(strategy,exchange,error){
   }
   var status = status_sheet.getDataRange().getValues();
   for(var i=1;i<status.length;i++){
-    if(status[i][0] === strategy){
+    if(String(status[i][0]) === strategy){
       status[i][9] = error;//Error
       status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
       break;
@@ -80,7 +80,7 @@ function error_reset_(strategy,exchange){
   }
   var status = status_sheet.getDataRange().getValues();
   for(var i=1;i<status.length;i++){
-    if(status[i][0] === strategy){
+    if(String(status[i][0]) === strategy){
       status[i][9] = 0;//Error
       status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
       break;

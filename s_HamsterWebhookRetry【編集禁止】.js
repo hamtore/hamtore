@@ -19,7 +19,7 @@ function retryWebhook_(){
   var sheet_value = sheet.getDataRange().getValues();
   
   for(var i = sheet_value.length - 1; i>=1; i--){
-        var strategy = sheet_value[i][0];
+        var strategy = String(sheet_value[i][0]);
         var position = sheet_value[i][1];
         var leverage = Number(sheet_value[i][2]) || 1.0;
         var memo = sheet_value[i][3];

@@ -39,7 +39,7 @@ function order_get_(){
   var productcodes = [];
   var prices = [];
   var positions = [];
-  var strategys = [];
+  var strategies = [];
   var volumes = [];
   var outstandings = [];
   var exchanges = [];
@@ -55,14 +55,14 @@ function order_get_(){
     productcodes[i] = result[i][1];
     prices[i] = result[i][2];
     positions[i] = result[i][3];
-    strategys[i] = result[i][4];
+    strategies[i] = String(result[i][4]);
     volumes[i] = result[i][5];
     outstandings[i] = result[i][6];
     exchanges[i] = result[i][7];
     ids[i] = result[i][8];
     errorcounts[i] = result[i][9];
   }
-  return [times,productcodes,prices,positions,strategys,volumes,outstandings,exchanges,ids,errorcounts];
+  return [times,productcodes,prices,positions,strategies,volumes,outstandings,exchanges,ids,errorcounts];
 }
 
 function order_delete_(tid){

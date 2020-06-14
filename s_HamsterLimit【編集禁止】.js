@@ -22,7 +22,7 @@ function hamsterlimit_(){
     var productcode = result[1][i];
     var price = Number(result[2][i]);
     var position = result[3][i];
-    var strategy = result[4][i];
+    var strategy = String(result[4][i]);
     var volume = Number(result[5][i]);
     var outstanding = Number(result[6][i]);  
     var exchange = result[7][i];
