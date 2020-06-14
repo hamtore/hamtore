@@ -32,12 +32,12 @@ function Hamster_(){
         var leverage;
         var memo;
         
-        m = remessage.exec(message);
+        m = remessage.exec(strSubject);
         if (m) { // default strategy alert message
           strategy = m[2];
           position = m[3].toUpperCase();
           leverage = Number(parseInt(m[4]));
-          memo = s;
+          memo = strSubject;
           // position_size = Number(parseInt(m[5]));
         } else { // custom alert message
           var ary = strSubject.split(',');

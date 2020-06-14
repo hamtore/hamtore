@@ -18,7 +18,7 @@ function doPost(e){
     strategy = m[2];
     position = m[3].toUpperCase();
     leverage = Number(parseInt(m[4]));
-    memo = s;
+    memo = message;
     // position_size = Number(parseInt(m[5]));
   } else { // custom alert message
     var ary = message.split(',');
