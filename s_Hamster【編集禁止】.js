@@ -2,6 +2,8 @@ var key;
 var secret;
 var minimumVolume = Number(bybit_minimumVolume);
 var regex = new RegExp(/^{{.+}}$/);
+var remessage = new RegExp(/^(strategy|\[strategy\]|\[st\]|\[ST\])?([^ :]+).*:.+ (buy|sell|buyalert|sellalert) @ (-?\d+) .+ (-?\d+).*$/);
+
 function Hamster_(){
   var lock = LockService.getScriptLock();
 
@@ -25,34 +27,44 @@ function Hamster_(){
         var strSubject = myMessages[i][j].getSubject();
         var strMessage = myMessages[i][j].getPlainBody().slice(0,200);
         
-        var ary = strSubject.split(',');
         var strategy;
         var position;
         var leverage;
         var memo;
-        strategy = ary[1];
-        position = Number(parseInt(ary[2])) || ary[2];
-        leverage = Number(parseInt(ary[3])) || 1.0;
-        memo = ary[4];
         
-        //position変換
-        if(position == 1){
-          position = "BUY";
-        }else if(position == -1){
-          position = "SELL";
-        }else if(position == 0){
-          position = "CLOSE";
-        }else if(position == 100){
-          position = "BUYALERT";
-        }else if(position == -100){
-          position = "SELLALERT";
-        }else if(Number(position)){
-          sendMessage_("invalid position code.");
-          return;
-        }else if(regex.test(position)) {
-          sendMessage_("position variable may not be expanded. please use pine script v4");
-          return;
-        }        
+        m = remessage.exec(strSubject);
+        if (m) { // default strategy alert message
+          strategy = m[2];
+          position = m[3].toUpperCase();
+          leverage = Number(parseInt(m[4]));
+          memo = strSubject;
+          // position_size = Number(parseInt(m[5]));
+        } else { // custom alert message
+          var ary = strSubject.split(',');
+          strategy = ary[1];
+          position = Number(parseInt(ary[2])) || ary[2];
+          leverage = Number(parseInt(ary[3])) || 1.0;
+          memo = ary[4];
+          
+          //position変換
+          if(position == 1){
+            position = "BUY";
+          }else if(position == -1){
+            position = "SELL";
+          }else if(position == 0){
+            position = "CLOSE";
+          }else if(position == 100){
+            position = "BUYALERT";
+          }else if(position == -100){
+            position = "SELLALERT";
+          }else if(Number(position)){
+            sendMessage_("invalid position code.");
+            return;
+          }else if(regex.test(position)) {
+            sendMessage_("position variable may not be expanded. please use pine script v4");
+            return;
+          }
+        }
 
         //短時間重複取引チェック
         if(strategylist.indexOf(strSubject) == -1){
