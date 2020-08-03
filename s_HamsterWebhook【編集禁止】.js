@@ -202,6 +202,8 @@ function doPost(e){
           sendMessage_(message);
           errorMessage_(e,strategy,exchange);
         }
+      }else{
+        insertRetry_([strategy,position,leverage,memo,1]);
       }
     }catch(e){
       var time = Utilities.formatDate(new Date(), 'JST', "yyyy-MM-dd'T'HH:mm:ss.sss");
