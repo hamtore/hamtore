@@ -26,11 +26,12 @@ function retryWebhook_(){
         var trynum = Number(sheet_value[i][4]) || 1;
 
         var status = status_get_(strategy); //[strategy,active,productcode,volume,time,todoubles,exchange,order_type,lats]
-        var active,productcode,volume,todoubles,exchange,order_type,lats;
+        var active,productcode,raw_volume,volume,todoubles,exchange,order_type,lats;
         if(status){
           active = status[1]; //ON or OFF
           productcode = status[2];
-          volume = Number(status[3]) * Number(leverage); //bitflyerの場合0.01BTC以上、bybitの場合0.0025BTC以上
+          raw_volume = Number(status[3]);
+          volume = raw_volume * Number(leverage); //bitflyerの場合0.01BTC以上、bybitの場合0.0025BTC以上
           todoubles = status[5];
           exchange = status[6];
           order_type = status[7];
@@ -171,7 +172,7 @@ function retryWebhook_(){
               price = 0;
               time = Utilities.formatDate(new Date(), 'JST', "yyyy-MM-dd'T'HH:mm:ss.sss");
               sheet.deleteRow(i+1);
-              todoubles_increase_(todoubles,volume,strategy,exchange);
+              todoubles_increase_(todoubles,raw_volume,strategy,exchange);
               var totalvolume,outstanding;
               try{
                 if(order_type.toUpperCase() == "MARKET"){
