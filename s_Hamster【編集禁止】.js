@@ -237,7 +237,7 @@ function Hamster_(){
                     if(position_size != undefined){
                       var tvtotalvolume = position_size * raw_volume;
                       if (totalvolume != tvtotalvolume){
-                        sendMessage_("MISMATCHED POSITION SIZE DETECTED! [tv][" + tvtotalvolume + "][hamtore][" + totalvolume + "]")
+                        sendMessage_("MISMATCHED POSITION SIZE DETECTED!\n" + strategy + "'s totalVolume [tv][" + tvtotalvolume + "][hamtore][" + totalvolume + "]")
                       }
                     }
                     error_reset_(strategy,exchange);
