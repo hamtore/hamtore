@@ -12,6 +12,7 @@ function doPost(e){
   var position;
   var leverage;
   var memo;
+  var position_size;
   
   m = remessage.exec(message);
   if (m) { // default strategy alert message
@@ -19,7 +20,7 @@ function doPost(e){
     position = m[3].toUpperCase();
     leverage = Number(parseInt(m[4]));
     memo = message;
-    // position_size = Number(parseInt(m[5]));
+    position_size = Number(parseInt(m[5]));
   } else { // custom alert message
     var ary = message.split(',');
     strategy = ary[1];
@@ -190,6 +191,12 @@ function doPost(e){
               console.log(volume);
               message = "===================\nTime:" + time + "\nStrategy:" + strategy + "\nPosition:" + position + "\nVolume:" + volume + "\nMemo:" + memo + "\nExchange:" + exchange + "\norder_type:" + order_type + "\nLats:" + lats + "\ntotalVolume:" + totalvolume;
               sendMessage_(message);
+              if(position_size != undefined){
+                var tvtotalvolume = position_size * raw_volume;
+                if (totalvolume != tvtotalvolume){
+                  sendMessage_("MISMATCHED POSITION SIZE DETECTED! [tv][" + tvtotalvolume + "][hamtore][" + totalvolume + "]")
+                }
+              }
               error_reset_(strategy,exchange);
             }
           }else if(order_type.toUpperCase() == "LIMIT"){
