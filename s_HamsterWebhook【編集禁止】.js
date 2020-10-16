@@ -12,6 +12,7 @@ function doPost(e){
   var position;
   var leverage;
   var memo;
+  var position_size;
   
   m = remessage.exec(message);
   if (m) { // default strategy alert message
@@ -19,7 +20,7 @@ function doPost(e){
     position = m[3].toUpperCase();
     leverage = Number(parseInt(m[4]));
     memo = message;
-    // position_size = Number(parseInt(m[5]));
+    position_size = Number(parseInt(m[5]));
   } else { // custom alert message
     var ary = message.split(',');
     strategy = ary[1];
@@ -48,11 +49,12 @@ function doPost(e){
   }
 
   var status = status_get_(strategy); //[strategy,active,productcode,volume,time,todoubles,exchange,order_type,lats]
-  var active,productcode,volume,todoubles,exchange,order_type,lats;
+  var active,productcode,raw_volume,volume,todoubles,exchange,order_type,lats;
   if(status){
     active = status[1]; //ON or OFF
     productcode = status[2];
-    volume = Number(status[3]) * Number(leverage); //bitflyerの場合0.01BTC以上、bybitの場合0.0025BTC以上
+    raw_volume = Number(status[3]);
+    volume = raw_volume * Number(leverage); //bitflyerの場合0.01BTC以上、bybitの場合0.0025BTC以上
     todoubles = status[5];
     exchange = status[6];
     order_type = status[7];
@@ -171,7 +173,7 @@ function doPost(e){
       if (tid){
         price = 0;
         time = Utilities.formatDate(new Date(), 'JST', "yyyy-MM-dd'T'HH:mm:ss.sss");
-        todoubles_increase_(todoubles,volume,strategy,exchange);
+        todoubles_increase_(todoubles,raw_volume,strategy,exchange);
         var totalvolume,outstanding;
         try{
           if(order_type.toUpperCase() == "MARKET"){
@@ -189,6 +191,15 @@ function doPost(e){
               console.log(volume);
               message = "===================\nTime:" + time + "\nStrategy:" + strategy + "\nPosition:" + position + "\nVolume:" + volume + "\nMemo:" + memo + "\nExchange:" + exchange + "\norder_type:" + order_type + "\nLats:" + lats + "\ntotalVolume:" + totalvolume;
               sendMessage_(message);
+              if(position_size != undefined){
+                var tvtotalvolume = position_size * raw_volume;
+                if(todoubles == 'ON'){
+                  tvtotalvolume = tvtotalvolume * 2;
+                }
+                if (totalvolume != tvtotalvolume){
+                  sendMessage_("MISMATCHED POSITION SIZE DETECTED!\n" + strategy + "'s totalVolume [tv][" + tvtotalvolume + "][hamtore][" + totalvolume + "]")
+                }
+              }
               error_reset_(strategy,exchange);
             }
           }else if(order_type.toUpperCase() == "LIMIT"){
@@ -201,6 +212,8 @@ function doPost(e){
           sendMessage_(message);
           errorMessage_(e,strategy,exchange);
         }
+      }else{
+        insertRetry_([strategy,position,leverage,memo,1]);
       }
     }catch(e){
       var time = Utilities.formatDate(new Date(), 'JST', "yyyy-MM-dd'T'HH:mm:ss.sss");
