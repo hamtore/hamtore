@@ -47,7 +47,7 @@ function retryWebhook_(){
     //短時間重複取引チェック
     if(strategylist.indexOf(strategy) == -1){
       strategylist.push(strategy);
-      if(createOrder(strategy, position, leverage, memo, position_size) == Status.retry && trynum < MAXTRYNUM){
+      if(createOrder(strategy, position, leverage, memo) == Status.retry && trynum < MAXTRYNUM){
         sheet.getRange(i+1,1,1,5).setValues([[strategy,position,leverage,memo,trynum+1]]);
         // do not remove row
         continue;
