@@ -188,7 +188,7 @@ function bybit_testnet_updateTable_(tids,prices,exec_dates){
       if(status[j][7] === tid && status[j][8] === ""){//ID: tid & Profit: "" 
         status[j][0] = time;
         status[j][2] = price;
-        status_sheet.getRange(j+1,1,1,11).setValues([status[j]]);
+        status_sheet.getRange(j+1,1,1,status[j].length).setValues([status[j]]);
         break;
       }
     }
