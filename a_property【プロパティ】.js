@@ -27,3 +27,10 @@ var BoostMode = "OFF";//ON or OFF
 
 //Bybit minimum volume
 var bybit_minimumVolume = 1.0;
+
+// checkExchangePositions settings
+var checkExchangePositionsSettings = {
+  'bybit': {'BTCUSD': false, 'ETHUSD': false, 'EOSUSD': false, 'XRPUSD': false},
+  'bybit_testnet': {'BTCUSD': false, 'ETHUSD': false, 'EOSUSD': false, 'XRPUSD': false},
+  'bitflyer': {'BTC_JPY': false, 'FX_BTC_JPY': false, 'ETH_BTC': false, 'BCH_BTC': false}
+};
