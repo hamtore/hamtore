@@ -37,7 +37,7 @@ function checkExchangePositions_() {
       }
       
       if (Math.abs(localPosition - exchangePosition) > 1e-5) {
-        sendMessage_("CHECK EXCHANGE POSITIONS FAILED! [productcode][ " + productcode + "][hamtore][" + localPosition + "][" + exchange + "][" + exchangePosition + "]");
+        sendMessage_("CHECK EXCHANGE POSITIONS FAILED! [productcode][" + productcode + "][hamtore][" + localPosition + "][" + exchange + "][" + exchangePosition + "]");
       }
     }
   }
