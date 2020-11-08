@@ -284,7 +284,11 @@ function bitflyer_getPositions_(productcode){
   var obj = JSON.parse(response.getContentText());
   var size = 0.0;
   for (var i=0; i<obj.length; i++) {
-    size += obj[i]['size'];
+    if (obj[i]['side'].toLowerCase() == 'sell') {
+      size -= obj[i]['size'];
+    } else {
+      size += obj[i]['size'];
+    }
   }
   return size;
 }

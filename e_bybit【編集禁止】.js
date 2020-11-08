@@ -362,9 +362,13 @@ function bybit_getPositions_(exchange, productcode){
   var response = UrlFetchApp.fetch(url, options);
   
   // レスポンスをJSONオブジェクトに
-  if (response == null) {
+  var json = JSON.parse(response.getContentText());
+  var result = json['result'];
+  if (result == null) {
     return undefined;
   }
-  var json = JSON.parse(response.getContentText());
-  return json['result']['size'];
+  if (result['side'].toLowerCase() == 'sell') {
+    return -result['size'];
+  }
+  return result['size'];
 }
