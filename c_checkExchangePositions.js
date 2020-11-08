@@ -3,7 +3,6 @@ var secret;
 
 function checkExchangePositions_() {
   totalPositions = getTotalPositions_();
-  console.log(totalPositions);
   for (var exchange in totalPositions) {
     for (var productcode in totalPositions[exchange]) {
       if (!(checkExchangePositionsSettings[exchange][productcode] || false)) {
