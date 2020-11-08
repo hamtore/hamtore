@@ -44,47 +44,35 @@ function checkExchangePositions_() {
 }
 
 function getTotalPositions_(){
-  var ret = {};
-
-  // bybit
-  var status_sheet_bybit = spreadSheet.getSheetByName('status_bybit');
-  var status_bybit = status_sheet_bybit.getDataRange().getValues();
-  for (var i=1;i<status_bybit.length;i++){
-    if (status_bybit[i][1] != 'ON') {
-      // skip not working strategy
-      continue;
+  var status = spreadSheet.getSheetByName('history');
+  var data = status.getDataRange().getValues();
+  
+  var totalVolumes = {};
+  for (var i=1; i<data.length; i++){
+    var prodcode = String(data[i][1]);
+    var strategy = String(data[i][4]);
+    var exchange = String(data[i][6]);
+    var volume = Number(data[i][10]) || 0.0;
+    if (!totalVolumes[exchange]) {
+      totalVolumes[exchange] = {};
     }
-    var prodcode = status_bybit[i][2];
-    var exchange = status_bybit[i][6];
-    var possize = Number(status_bybit[i][10]) || 0;
-    if (!ret[exchange]) {
-      ret[exchange] = {};
-      ret[exchange][prodcode] = possize;
-    } else if (!ret[exchange][prodcode]) {
-      ret[exchange][prodcode] = possize;
-    } else {
-      ret[exchange][prodcode] = possize + ret[exchange][prodcode];
+    if (!totalVolumes[exchange][prodcode]) {
+      totalVolumes[exchange][prodcode] = {};
     }
+    totalVolumes[exchange][prodcode][strategy] = volume;
   }
   
-  // bitflyer
-  var status_sheet_bitflyer = spreadSheet.getSheetByName('status_bitflyer');
-  var status_bitflyer = status_sheet_bitflyer.getDataRange().getValues();
-  for (var i=1;i<status_bitflyer.length;i++){
-    if (status_bitflyer[i][1] != 'ON') {
-      // skip not working strategy
-      continue;
-    }
-    var prodcode = status_bitflyer[i][2];
-    var exchange = status_bitflyer[i][6];
-    var possize = Number(status_bitflyer[i][10]) || 0;
-    if (!ret[exchange]) {
-      ret[exchange] = {};
-      ret[exchange][prodcode] = possize;
-    } else if (!ret[exchange][prodcode]) {
-      ret[exchange][prodcode] = possize;
-    } else {
-      ret[exchange][prodcode] = possize + ret[exchange][prodcode];
+  var ret = {};
+  for (var exchange in totalVolumes) {
+    for (var prodcode in totalVolumes[exchange]) {
+      var totalVolume = 0.0;
+      for (var strategy in totalVolumes[exchange][prodcode]) {
+        totalVolume += totalVolumes[exchange][prodcode][strategy];
+      }
+      if (!ret[exchange]) {
+        ret[exchange] = {};
+      }
+      ret[exchange][prodcode] = totalVolume;
     }
   }
 
