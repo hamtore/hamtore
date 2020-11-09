@@ -153,7 +153,6 @@ function createOrder(strategy, position, leverage, memo, position_size, trynum) 
         //bitflyer専用時刻確認
         time = Utilities.formatDate(new Date(), 'JST', "HH:mm");
         if(time >= "03:50" && time <= "04:13"){
-          lock.releaseLock();
           return Status.retry;
         }
         
