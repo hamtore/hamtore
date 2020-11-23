@@ -67,7 +67,7 @@ function todoubles_increase_(todoubles,volume,strategy,exchange){
         if(String(status[i][0]) === strategy){
           status[i][3] = volume * 2;//Volume
           status[i][5] = "OFF";// ToDoubles
-          status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
+          status_sheet.getRange(i+1,1,1,status[i].length).setValues([status[i]]);
           break;
         }
       }
@@ -90,7 +90,7 @@ function strategy_start_(strategy,exchange){
     for(var i=1;i<status.length;i++){
       if(String(status[i][0]) === strategy){
         status[i][1] = "ON"; // Active
-        status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
+        status_sheet.getRange(i+1,1,1,status[i].length).setValues([status[i]]);
         break;
       }
     }
@@ -112,7 +112,7 @@ function strategy_stop_(strategy,exchange){
     for(var i=1;i<status.length;i++){
       if(String(status[i][0]) === strategy){
         status[i][1] = "OFF"; // Active
-        status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
+        status_sheet.getRange(i+1,1,1,status[i].length).setValues([status[i]]);
         break;
       }
     }
@@ -130,7 +130,7 @@ function emergency_stop_(){
     for(var i=1;i<status_bitflyer.length;i++){
       if(status_bitflyer[i][1] === "ON"){
         status_bitflyer[i][1] = "OFF"; // Active
-        status_sheet_bitflyer.getRange(i+1,1,1,10).setValues([status_bitflyer[i]]);
+        status_sheet_bitflyer.getRange(i+1,1,1,status_bitflyer[i].length).setValues([status_bitflyer[i]]);
       }
     }
     var status_sheet_bybit = spreadSheet.getSheetByName('status_bybit');
@@ -138,7 +138,7 @@ function emergency_stop_(){
     for(var i=1;i<status_bybit.length;i++){
       if(status_bybit[i][1] === "ON"){
         status_bybit[i][1] = "OFF"; // Active
-        status_sheet_bybit.getRange(i+1,1,1,10).setValues([status_bybit[i]]);
+        status_sheet_bybit.getRange(i+1,1,1,status_bybit[i].length).setValues([status_bybit[i]]);
       }
     }
   }catch (e) {

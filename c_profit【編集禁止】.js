@@ -116,7 +116,7 @@ function setProfit_() {
         data[j][8] = profit;
         data[j][9] = averagePrice;
         data[j][10] = totalVolume;
-        status.getRange(j+1,1,1,11).setValues([data[j]]);
+        status.getRange(j+1,1,1,data[j].length).setValues([data[j]]);
         break;
       }
     }
@@ -170,6 +170,6 @@ function profitReset() {
     data[i][8] = "";
     data[i][9] = "";
     data[i][10] = "";
-    status.getRange(i+1,1,1,11).setValues([data[i]]);
+    status.getRange(i+1,1,1,data[i].length).setValues([data[i]]);
   }
 }

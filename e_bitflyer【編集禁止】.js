@@ -215,3 +215,80 @@ function bitflyer_getTime_(exchange,productcode,target){
   
   return time;
 }
+
+function bitflyer_getBalance_(productcode){
+  var timestamp = Date.now().toString();
+  var method = 'GET';
+  var path = '/v1/me/getbalance';
+  var text = timestamp + method + path;
+  var signature = Utilities.computeHmacSha256Signature(text, secret);
+  var sign = signature.reduce(function(str,chr){
+    chr = (chr < 0 ? chr + 256 : chr).toString(16);
+    return str + (chr.length==1?'0':'') + chr;
+  },'');
+
+  var url = 'https://api.bitflyer.com' + path;
+  var options = {
+      method: method,
+      headers: {
+        'ACCESS-KEY': key,
+        'ACCESS-TIMESTAMP': timestamp,
+        'ACCESS-SIGN': sign,
+        'Content-Type': 'application/json'
+      }
+  };
+
+  var response = UrlFetchApp.fetch(url, options);
+
+  if( response == null ){
+    return undefined;
+  }
+  var obj = JSON.parse(response.getContentText());
+  var code = productcode.split('_')[0];
+  for (var i=0; i<obj.length; i++) {
+    if (obj[i]['currency_code'] == code) {
+      return obj[i]['amount'];
+    }
+  }
+  return undefined;
+}
+
+function bitflyer_getPositions_(productcode){
+  var timestamp = Date.now().toString();
+  var method = 'GET';
+  var path = '/v1/me/getpositions';
+  path = path + '?product_code=' + productcode;
+  var text = timestamp + method + path;
+  var signature = Utilities.computeHmacSha256Signature(text, secret);
+  var sign = signature.reduce(function(str,chr){
+    chr = (chr < 0 ? chr + 256 : chr).toString(16);
+    return str + (chr.length==1?'0':'') + chr;
+  },'');
+
+  var url = 'https://api.bitflyer.com' + path;
+  var options = {
+      method: method,
+      headers: {
+        'ACCESS-KEY': key,
+        'ACCESS-TIMESTAMP': timestamp,
+        'ACCESS-SIGN': sign,
+        'Content-Type': 'application/json'
+      }
+  };
+
+  var response = UrlFetchApp.fetch(url, options);
+
+  if( response == null ){
+    return undefined;
+  }
+  var obj = JSON.parse(response.getContentText());
+  var size = 0.0;
+  for (var i=0; i<obj.length; i++) {
+    if (obj[i]['side'].toLowerCase() == 'sell') {
+      size -= obj[i]['size'];
+    } else {
+      size += obj[i]['size'];
+    }
+  }
+  return size;
+}

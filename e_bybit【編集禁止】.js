@@ -325,3 +325,50 @@ function bybit_getTime_(exchange,productcode,order_id){
   }
   return time;
 }
+
+function bybit_getPositions_(exchange, productcode){
+  if(exchange == "bybit"){
+    key = bybit_key;
+    secret = bybit_secret;
+  }else if(exchange == "bybit_testnet"){
+    key = bybit_testnet_key;
+    secret = bybit_testnet_secret;
+  }
+
+  var timestamp = Date.now().toString();
+  var method = 'GET';
+  var path = '/v2/private/position/list';
+  var param_str = "api_key=" + key + "&symbol=" + productcode + "&timestamp=" + timestamp;
+
+  var signature = Utilities.computeHmacSha256Signature(param_str, secret);
+  var sign = signature.reduce(function(str,chr){
+    chr = (chr < 0 ? chr + 256 : chr).toString(16);
+    return str + (chr.length==1?'0':'') + chr;
+  },'');
+
+  if(exchange == "bybit_testnet"){
+    var url = 'https://api-testnet.bybit.com' + path + "?" + param_str + "&sign=" + sign;
+  }else if(exchange == "bybit"){
+    var url = 'https://api.bybit.com' + path + "?" + param_str + "&sign=" + sign;
+  }
+
+  var options = {
+    url: url,
+    method: method,
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+  };
+
+  //送信してレスポンス取得
+  var response = UrlFetchApp.fetch(url, options);
+  
+  // レスポンスをJSONオブジェクトに
+  var json = JSON.parse(response.getContentText());
+  var result = json['result'];
+  if (result == null) {
+    return undefined;
+  }
+  if (result['side'].toLowerCase() == 'sell') {
+    return -result['size'];
+  }
+  return result['size'];
+}

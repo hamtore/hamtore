@@ -66,7 +66,7 @@ function order_error_(strategy,exchange,error){
   for(var i=1;i<status.length;i++){
     if(String(status[i][0]) === strategy){
       status[i][9] = error;//Error
-      status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
+      status_sheet.getRange(i+1,1,1,status[i].length).setValues([status[i]]);
       break;
     }
   }
@@ -82,7 +82,7 @@ function error_reset_(strategy,exchange){
   for(var i=1;i<status.length;i++){
     if(String(status[i][0]) === strategy){
       status[i][9] = 0;//Error
-      status_sheet.getRange(i+1,1,1,10).setValues([status[i]]);
+      status_sheet.getRange(i+1,1,1,status[i].length).setValues([status[i]]);
       break;
     }
   }

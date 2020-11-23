@@ -18,6 +18,11 @@ function retryWebhook() {
   retryWebhook_();
 }
 
+//ポジション確認用　トリガー設定要
+function checkExchangePositions() {
+  checkExchangePositions_();
+}
+
 //Hamsterトリガー自動設定用　トリガーセット不要
 function TriggerSetting(){
   setTrigger_();

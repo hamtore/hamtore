@@ -26,7 +26,7 @@ function order_errorcount_(tid,errorcount){
   for(var i=0;i<data.length;i++){
     if(data[i][8] === tid){
       data[i][9] = errorcount;
-      status.getRange(i+1,1,1,10).setValues([data[i]]);
+      status.getRange(i+1,1,1,data[i].length).setValues([data[i]]);
     }
   }
 }

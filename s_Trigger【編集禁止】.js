@@ -7,6 +7,7 @@ function setTrigger_(){
     count = 1;
   }
   var trigger = ScriptApp.newTrigger("historyUpdater").timeBased().everyHours(4).create();
+  var trigger = ScriptApp.newTrigger("checkExchangePositions").timeBased().everyHours(12).create();
   for(var i=1 ;i <= count ; i++){
     var seconds = Utilities.formatDate(new Date(), 'JST', "ss");
     var start = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd/HH:mm:sss');
