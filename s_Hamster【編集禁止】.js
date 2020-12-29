@@ -261,11 +261,11 @@ function createOrder(strategy, position, leverage, memo, position_size, trynum) 
             order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
           }
         }catch(e){
-          time = Utilities.formatDate(new Date(), 'JST', "yyyy-MM-dd'T'HH:mm:ss.sss");
-          message = strategy + "：" + e;
+          // 注文には成功しているためリトライしない
+          message = "===================\n" + "postprocessing failed. [strategy][" + strategy + "][exception][" + e + "]";
           sendMessage_(message);
           errorMessage_(e,strategy,exchange);
-          return Status.retry;
+          return Status.success;
         }
       }else{
         return Status.retry;
