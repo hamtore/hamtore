@@ -133,15 +133,15 @@ function bitflyer_getExecutions_(productcode,target,time){
   Logger.log(json);
   Logger.log(target);
   // ステータスと値段を取り出す
-  for each(var obj in json){
-    var id = obj.id;
-    var orderid = obj.child_order_id;
-    var side = obj.side;
-    var price = obj.price;
-    var size = obj.size;
-    var commission = obj.commission;
-    var exec_date = obj.exec_date;
-    var acceptance = obj.child_order_acceptance_id;
+  for (var i = 0; i < json.length; i++){
+    var id = json[i].id;
+    var orderid = json[i].child_order_id;
+    var side = json[i].side;
+    var price = json[i].price;
+    var size = json[i].size;
+    var commission = json[i].commission;
+    var exec_date = json[i].exec_date;
+    var acceptance = json[i].child_order_acceptance_id;
   }
   
   if(!exec_date){

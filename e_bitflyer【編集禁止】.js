@@ -188,8 +188,8 @@ function bitflyer_getTime_(exchange,productcode,target){
   var json = JSON.parse(response.getContentText());
   
   // ステータスと値段を取り出す
-  for each(var obj in json){
-    var exec_date = obj.exec_date;
+  for (var i = 0; i < json.length; i++){
+    var exec_date = json[i].exec_date;
   }
   var time;
   try{  
