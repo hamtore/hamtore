@@ -16,8 +16,10 @@ function doPost(e){
   var leverage = ret[2];
   var memo = ret[3];
   var position_size = ret[4];
+  var limitprice = ret[5];
+  var limitcancel = ret[6];
   
-  if(createOrder_(strategy, position, leverage, memo, position_size) == Status.retry){
+  if(createOrder_(strategy, position, leverage, memo, position_size, limitprice, limitcancel) == Status.retry){
     insertRetry_([message,1]);
   }
 }
@@ -47,11 +49,13 @@ function retryWebhook_(){
     var leverage = ret[2];
     var memo = ret[3];
     var position_size = ret[4];
+    var limitprice = ret[5];
+    var limitcancel = ret[6];
     
     //短時間重複取引チェック
     if(strategylist.indexOf(strategy) == -1){
       strategylist.push(strategy);
-      if(createOrder_(strategy, position, leverage, memo, position_size) == Status.retry && trynum < MAXTRYNUM){
+      if(createOrder_(strategy, position, leverage, memo, position_size, limitprice, limitcancel) == Status.retry && trynum < MAXTRYNUM){
         sheet.getRange(i+1,1,1,2).setValues([[message,trynum+1]]);
         // do not remove row
         continue;

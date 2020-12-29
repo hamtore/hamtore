@@ -1,12 +1,15 @@
-function bitflyer_sendOrder_(productcode,position,volume,order_type){ 
+function bitflyer_sendOrder_(productcode,position,volume,order_type,limitprice){ 
   var timestamp = Date.now().toString();
   var method = 'POST';
   var path = '/v1/me/sendchildorder';
 
   if(order_type.toUpperCase() == "LIMIT"){
     var order_type = "LIMIT";
-    if(productcode.match('JPY') || productcode.match('BTC')){
-      var price = Number(bitflyer_getPrice_(productcode,position));
+    var price;
+    if (limitprice != undefined) {
+      price = limitprice;
+    }else if(productcode.match('JPY') || productcode.match('BTC')){
+      price = Number(bitflyer_getPrice_(productcode,position));
     }
   }else if(order_type.toUpperCase() == "MARKET"){
     var order_type = "MARKET";  
@@ -107,6 +110,11 @@ function bitflyer_getOrder_(tid,productcode){
 
   if( response != null ){
     var json = JSON.parse(response.getContentText());
+    if (!json[0]) {
+      // bitflyer はキャンセルした注文を保持していないためjsonを返却しない
+      // empty array として返却し後続の処理に委ねる
+      return [];
+    }
     var ordStatus = json[0].child_order_state;
     var outstanding = json[0].outstanding_size;
     var time = json[0].child_order_date;

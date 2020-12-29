@@ -1,4 +1,4 @@
-function bybit_sendOrder_(productcode,position,volume,exchange,order_type){
+function bybit_sendOrder_(productcode,position,volume,exchange,order_type,limitprice){
   var timestamp = Date.now().toString();
   var method = 'POST';
   var path = '/v2/private/order/create';
@@ -24,7 +24,7 @@ function bybit_sendOrder_(productcode,position,volume,exchange,order_type){
 
   if(order_type.toUpperCase() == "LIMIT"){
     var order_type = "Limit";
-    var price = Number(bybit_getPrice_(productcode,position,exchange));
+    var price = limitprice != undefined ? limitprice : Number(bybit_getPrice_(productcode,position,exchange));
     var param_str = "api_key=" + key + "&order_type=" + order_type + "&price=" + price + "&qty=" + volume + "&side=" + position + "&symbol=" + productcode + "&time_in_force=GoodTillCancel" + "&timestamp=" + timestamp;
   }else if(order_type.toUpperCase() == "MARKET"){
     var order_type = "Market";
@@ -164,7 +164,7 @@ function bybit_getOrder_(order_id,productcode,exchange,position){
   return [ordStatus,outstanding,time];
 }
 
-function bybit_Cancel_(order_id,exchange){
+function bybit_Cancel_(order_id,productcode,exchange){
   if(exchange == "bybit"){
     key = bybit_key;
     secret = bybit_secret;

@@ -40,11 +40,13 @@ function Hamster_(){
         var leverage = ret[2];
         var memo = ret[3];
         var position_size = ret[4];
+        var limitprice = ret[5];
+        var limitcancel = ret[6];
 
         //短時間重複取引チェック
         if(strategylist.indexOf(strSubject) == -1){
           strategylist.push(strSubject);
-          if (createOrder_(strategy, position, leverage, memo, position_size) == Status.retry){
+          if (createOrder_(strategy, position, leverage, memo, position_size, limitprice, limitcancel) == Status.retry){
             // do not remove the mail
             continue;
           }
@@ -59,7 +61,7 @@ function Hamster_(){
 
 
 function interpretMessage_(message){
-  var strategy, position, leverage, memo, position_size;
+  var strategy, position, leverage, memo, position_size, limitprice, limitcancel;
   m = remessage.exec(message);
   if (m) { // default strategy alert message
     strategy = m[2];
@@ -68,11 +70,22 @@ function interpretMessage_(message){
     memo = message;
     position_size = Number(parseInt(m[5]));
   } else { // custom alert message
-    var ary = message.split(',');
-    strategy = ary[1];
-    position = Number(parseInt(ary[2])) || ary[2];
-    leverage = Number(parseInt(ary[3])) || 1.0;
-    memo = ary[4];
+    try {  // json alert message
+      obj = JSON.parse(message);
+      strategy = obj.strategy;
+      position = obj.position.toUpperCase();
+      leverage = Number(parseInt(obj.leverage));
+      memo = obj.memo
+      position_size = Number(parseInt(obj.position_size));
+      limitprice = Number(obj.limitprice);
+      limitcancel = Boolean(obj.limitcancel);
+    } catch (e) {  // , alert message
+      var ary = message.split(',');
+      strategy = ary[1];
+      position = Number(parseInt(ary[2])) || ary[2];
+      leverage = Number(parseInt(ary[3])) || 1.0;
+      memo = ary[4];
+    }
     
     //position変換
     if(position == 1){
@@ -93,11 +106,11 @@ function interpretMessage_(message){
       throw new Error('Exit');
     }
   }
-  return [strategy, position, leverage, memo, position_size]
+  return [strategy, position, leverage, memo, position_size, limitprice, limitcancel]
 }
 
 
-function createOrder_(strategy, position, leverage, memo, position_size) {
+function createOrder_(strategy, position, leverage, memo, position_size, limitprice, limitcancel) {
   var status = status_get_(strategy); //[strategy,active,productcode,volume,time,todoubles,exchange,order_type,lats]
   var active,productcode,raw_volume,volume,todoubles,exchange,order_type,lats;
   if(status){
@@ -175,7 +188,7 @@ function createOrder_(strategy, position, leverage, memo, position_size) {
           volume = 0.01;
         }
         
-        tid = bitflyer_sendOrder_(productcode,position,volume,order_type);
+        tid = bitflyer_sendOrder_(productcode,position,volume,order_type,limitprice);
         
       }else if(exchange == "bybit" || exchange == "bybit_testnet"){
         if (volume >= minimumVolume){
@@ -210,7 +223,7 @@ function createOrder_(strategy, position, leverage, memo, position_size) {
           console.log(volume);
           console.log(exchange);
           console.log(order_type);
-          tid = bybit_sendOrder_(productcode,position,volume,exchange,order_type);
+          tid = bybit_sendOrder_(productcode,position,volume,exchange,order_type,limitprice);
         }else{
           sendMessage_("===================\nThe bot should never send an order with volume < $" + minimumVolume);
           message = "***" + strategy + "***を強制停止します";
@@ -225,7 +238,7 @@ function createOrder_(strategy, position, leverage, memo, position_size) {
       
       console.log(tid);
       if (tid){
-        price = 0;
+        price = limitprice || null;
         time = Utilities.formatDate(new Date(), 'JST', "yyyy-MM-dd'T'HH:mm:ss.sss");
         todoubles_increase_(todoubles,raw_volume,strategy,exchange);
         var totalvolume,outstanding;
@@ -257,8 +270,11 @@ function createOrder_(strategy, position, leverage, memo, position_size) {
               error_reset_(strategy,exchange);
             }
           }else if(order_type.toUpperCase() == "LIMIT"){
+            if (limitcancel) {
+              cancelLimitOrder_(productcode,position,strategy,exchange);
+            }
             outstanding = Number(volume);
-            order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+            order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
           }
         }catch(e){
           // 注文には成功しているためリトライしない
@@ -281,4 +297,32 @@ function createOrder_(strategy, position, leverage, memo, position_size) {
     return Status.skip;
   }
   return Status.success;
+}
+
+function cancelLimitOrder_(productcode,position,strategy,exchange){
+  // matchするオーダーをキャンセルする
+  // order table の変更は HamsterLimit_ に委任する
+  var result = order_get_();
+
+  var tablecount = 0;
+  while(result[0][tablecount]){
+    tablecount += 1;
+  }
+
+  for(var i=1;i<tablecount;i++){
+    // result: [time, productcode, price, position, strategy, volume, outstanding, exchange, tid, memo, errorcount]
+    if (productcode == result[1][i] && position == result[3][i] && strategy == String(result[4][i]) && exchange == result[7][i]) {
+      var tid = result[8][i];
+      try {      
+        if (exchange == "bybit" || exchange == "bybit_testnet"){
+          bybit_Cancel_(tid, productcode, exchange);
+        } else if (exchange == "bitflyer") {
+          bitflyer_Cancel_(tid, productcode);
+        }
+      }catch(e){
+        // コンソールログだけ出して処理を継続する
+        console.log("cancel order failed. [exception][" + e + "]");
+      }
+    }
+  }
 }

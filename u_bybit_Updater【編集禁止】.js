@@ -79,7 +79,7 @@ function bybit_getTable_(){
   var status_sheet = spreadSheet.getSheetByName('history');
   var status = status_sheet.getDataRange().getValues();
   for(var i=1;i<status.length;i++){
-    if(status[i][6] === "bybit" && status[i][8] === "" && status[i][2] === 0){//Exchange: bybit & Profit: "" &Price = 0 
+    if(status[i][6] === "bybit" && status[i][8] === "" && !status[i][2]){//Exchange: bybit & Profit: "" & not Price
       result.push(status[i]);
     }
   }

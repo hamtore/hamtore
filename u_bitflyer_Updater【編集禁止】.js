@@ -81,7 +81,7 @@ function bitflyer_getTable_(){
   var status_sheet = spreadSheet.getSheetByName('history');
   var status = status_sheet.getDataRange().getValues();
   for(var i=1;i<status.length;i++){
-    if(status[i][6] === "bitflyer" && status[i][8] === "" && status[i][2] === 0){//Exchange: bitflyer & Profit: "" 
+    if(status[i][6] === "bitflyer" && status[i][8] === "" && !status[i][2]){//Exchange: bitflyer & Profit: "" & not Price
       result.push(status[i]);
     }
   }
