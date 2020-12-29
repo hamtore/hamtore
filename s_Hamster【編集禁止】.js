@@ -34,7 +34,7 @@ function Hamster_(){
         var strSubject = myMessages[i][j].getSubject();
         var strMessage = myMessages[i][j].getPlainBody().slice(0,200);
         
-        var ret = interpretMessage(strSubject);
+        var ret = interpretMessage_(strSubject);
         var strategy = ret[0];
         var position = ret[1];
         var leverage = ret[2];
@@ -44,7 +44,7 @@ function Hamster_(){
         //短時間重複取引チェック
         if(strategylist.indexOf(strSubject) == -1){
           strategylist.push(strSubject);
-          if (createOrder(strategy, position, leverage, memo, position_size) == Status.retry){
+          if (createOrder_(strategy, position, leverage, memo, position_size) == Status.retry){
             // do not remove the mail
             continue;
           }
@@ -58,7 +58,7 @@ function Hamster_(){
 }
 
 
-function interpretMessage(message){
+function interpretMessage_(message){
   var strategy, position, leverage, memo, position_size;
   m = remessage.exec(message);
   if (m) { // default strategy alert message
@@ -97,7 +97,7 @@ function interpretMessage(message){
 }
 
 
-function createOrder(strategy, position, leverage, memo, position_size, trynum) {
+function createOrder_(strategy, position, leverage, memo, position_size) {
   var status = status_get_(strategy); //[strategy,active,productcode,volume,time,todoubles,exchange,order_type,lats]
   var active,productcode,raw_volume,volume,todoubles,exchange,order_type,lats;
   if(status){
