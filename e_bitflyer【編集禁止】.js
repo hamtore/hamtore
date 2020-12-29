@@ -20,11 +20,12 @@ function bitflyer_sendOrder_(productcode,position,volume,order_type,limitprice){
   }else if(position.toUpperCase() == "SELL"){
     var position = "SELL";
   }
-    
-  if(productcode.match("ETH") || productcode.match("BCH")){
-    volume = Number(volume).toFixed(0);
+  
+  // see: https://bitflyer.com/ja-jp/faq/4-27
+  if(productcode == "BTC_JPY"){
+    volume = Number(volume).toFixed(3);
   }else{
-    volume = Number(volume).toFixed(8);
+    volume = Number(volume).toFixed(2);
   }
     
   if(order_type == "MARKET"){
