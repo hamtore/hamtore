@@ -105,8 +105,8 @@ function bybit_testnet_getExecutions_(productcode,order_id,time){
 
   var timestamp = Date.now().toString();
   var method = 'GET';
-  var path = '/open-api/order/list';
-  var param_str = "api_key=" + key + "&order_id=" + order_id + "&timestamp=" + timestamp;
+  var path = '/v2/private/order';
+  var param_str = "api_key=" + key + "&order_id=" + order_id + "&symbol=" + productcode + "&timestamp=" + timestamp;
 
   var signature = Utilities.computeHmacSha256Signature(param_str, secret);
   var sign = signature.reduce(function(str,chr){
@@ -127,15 +127,15 @@ function bybit_testnet_getExecutions_(productcode,order_id,time){
   
   // レスポンスをJSONオブジェクトに
   var json = JSON.parse(response.getContentText());
-  var id = json.result.data[0].order_id;
-  var orderid = json.result.data[0].order_id;
-  var side = json.result.data[0].side;
-  var price = json.result.data[0].price;
-  var size = json.result.data[0].qty;
-  var commission = json.result.data[0].cum_exec_fee;
-  var exec_date = json.result.data[0].updated_at;
+  var id = json.result.order_id;
+  var orderid = json.result.order_id;
+  var side = json.result.side;
+  var price = json.result.price;
+  var size = json.result.qty;
+  var commission = json.result.cum_exec_fee;
+  var exec_date = json.result.updated_at;
   exec_date = exec_date.slice(0, -1);
-  var acceptance = json.result.data[0].order_id;
+  var acceptance = json.result.order_id;
   
   // ステータスと値段を取り出す
   

@@ -107,7 +107,6 @@ function hamsterlimit_(){
         var tid0 = tid;
         if(exchange == "bybit" || exchange == "bybit_testnet"){
           if((ordStatus == "New" || ordStatus == "PartiallyFilled") & outstanding > 0){
-            //bybit_PriceUpdate_(productcode,position,exchange,tid);
             return;
           }else if(ordStatus == "Rejected"){
             tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type,price);

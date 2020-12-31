@@ -209,52 +209,6 @@ function bybit_Cancel_(order_id,productcode,exchange){
   return [response];
 }
 
-function bybit_PriceUpdate_(productcode,position,exchange,order_id){
-  var timestamp = Date.now().toString();
-  var method = 'POST';
-  var path = '/open-api/order/replace';
-
-  if(position.toUpperCase() == "BUY"){
-    var position = "Buy";
-  }else if(position.toUpperCase() == "SELL"){
-    var position = "Sell";
-  }
-
-  var price = Number(bybit_getPrice_(productcode,position,exchange));
-
-  var param_str = "api_key=" + key + "&order_id=" + order_id + "&p_r_price=" + price + "&symbol=" + productcode + "&timestamp=" + timestamp;
-  var signature = Utilities.computeHmacSha256Signature(param_str, secret);
-  var sign = signature.reduce(function(str,chr){
-    chr = (chr < 0 ? chr + 256 : chr).toString(16);
-    return str + (chr.length==1?'0':'') + chr;
-  },'');
-
-  var body = JSON.stringify({
-    api_key: key,
-    order_id: order_id,
-    p_r_price: price,
-    symbol: productcode,
-    timestamp: timestamp,
-    sign: sign
-  });
-
-  if(exchange == "bybit_testnet"){
-    var url = 'https://api-testnet.bybit.com' + path;
-  }else if(exchange == "bybit"){
-    var url = 'https://api.bybit.com' + path;
-  }
-  
-  var options = {
-    url: url,
-    method: method,
-    payload: body,
-    headers: {'Content-Type': 'application/json'}
-  };
-
-  var response = UrlFetchApp.fetch(url, options);
-  return [response];
-}
-
 function bybit_getTime_(exchange,productcode,order_id){
   if(exchange == "bybit"){
     key = bybit_key;
