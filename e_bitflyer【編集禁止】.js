@@ -21,13 +21,8 @@ function bitflyer_sendOrder_(productcode,position,volume,order_type,limitprice){
     var position = "SELL";
   }
   
-  // see: https://bitflyer.com/ja-jp/faq/4-27
-  if(productcode == "BTC_JPY"){
-    volume = Number(volume).toFixed(3);
-  }else{
-    volume = Number(volume).toFixed(2);
-  }
-    
+  volume = Number(volume).toFixed(8);
+
   if(order_type == "MARKET"){
     var body = JSON.stringify({
       product_code: productcode,
