@@ -156,6 +156,9 @@ function createOrder_(strategy, position, leverage, memo, position_size, limitpr
     message = "===================\nPosition:" + position + "\nStrategy:" + strategy + "\nMemo:" + memo + "\nExchange:" + exchange;
     sendMessage_(message);
     return Status.success;
+  }else if(position == "CANCEL"){
+    cancelLimitOrder_(productcode,position,strategy,exchange);
+    return Status.success;
   }else if(active.toUpperCase() == "ON"){
     var time, price, collateral, lastTradeInfo, message, tid;
     try{
