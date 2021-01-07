@@ -1,12 +1,15 @@
-function bitflyer_sendOrder_(productcode,position,volume,order_type){ 
+function bitflyer_sendOrder_(productcode,position,volume,order_type,limitprice){ 
   var timestamp = Date.now().toString();
   var method = 'POST';
   var path = '/v1/me/sendchildorder';
 
   if(order_type.toUpperCase() == "LIMIT"){
     var order_type = "LIMIT";
-    if(productcode.match('JPY') || productcode.match('BTC')){
-      var price = Number(bitflyer_getPrice_(productcode,position));
+    var price;
+    if (limitprice != undefined) {
+      price = limitprice;
+    }else if(productcode.match('JPY') || productcode.match('BTC')){
+      price = Number(bitflyer_getPrice_(productcode,position));
     }
   }else if(order_type.toUpperCase() == "MARKET"){
     var order_type = "MARKET";  
@@ -17,13 +20,9 @@ function bitflyer_sendOrder_(productcode,position,volume,order_type){
   }else if(position.toUpperCase() == "SELL"){
     var position = "SELL";
   }
-    
-  if(productcode.match("ETH") || productcode.match("BCH")){
-    volume = Number(volume).toFixed(0);
-  }else{
-    volume = Number(volume).toFixed(8);
-  }
-    
+  
+  volume = Number(volume).toFixed(8);
+
   if(order_type == "MARKET"){
     var body = JSON.stringify({
       product_code: productcode,
@@ -107,6 +106,11 @@ function bitflyer_getOrder_(tid,productcode){
 
   if( response != null ){
     var json = JSON.parse(response.getContentText());
+    if (!json[0]) {
+      // bitflyer はキャンセルした注文を保持していないためjsonを返却しない
+      // empty array として返却し後続の処理に委ねる
+      return [];
+    }
     var ordStatus = json[0].child_order_state;
     var outstanding = json[0].outstanding_size;
     var time = json[0].child_order_date;
@@ -180,8 +184,8 @@ function bitflyer_getTime_(exchange,productcode,target){
   var json = JSON.parse(response.getContentText());
   
   // ステータスと値段を取り出す
-  for each(var obj in json){
-    var exec_date = obj.exec_date;
+  for (var i = 0; i < json.length; i++){
+    var exec_date = json[i].exec_date;
   }
   var time;
   try{  

@@ -1,4 +1,4 @@
-function order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid){
+function order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo){
   if(position == "Buy"){
     position = "BUY";
   }else if(position == "Sell"){
@@ -9,7 +9,7 @@ function order_insert_(time,productcode,price,position,strategy,volume,outstandi
   if (lock.tryLock(10000)) {
     try {
       var status = spreadSheet.getSheetByName('order');
-      status.appendRow([time,productcode,price,position,strategy,volume,outstanding,exchange,tid,0]);
+      status.appendRow([time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo,0]);
     }catch(e){
       sendMessage_(e);
     }finally{
@@ -25,7 +25,7 @@ function order_errorcount_(tid,errorcount){
   var data = status.getDataRange().getValues();
   for(var i=0;i<data.length;i++){
     if(data[i][8] === tid){
-      data[i][9] = errorcount;
+      data[i][10] = errorcount;
       status.getRange(i+1,1,1,data[i].length).setValues([data[i]]);
     }
   }
@@ -44,6 +44,7 @@ function order_get_(){
   var outstandings = [];
   var exchanges = [];
   var ids = [];
+  var memos = [];
   var errorcounts = [];
   //ordertableにない場合、終了
   if (!result){
@@ -60,9 +61,10 @@ function order_get_(){
     outstandings[i] = result[i][6];
     exchanges[i] = result[i][7];
     ids[i] = result[i][8];
-    errorcounts[i] = result[i][9];
+    memos[i] = result[i][9];
+    errorcounts[i] = result[i][10];
   }
-  return [times,productcodes,prices,positions,strategies,volumes,outstandings,exchanges,ids,errorcounts];
+  return [times,productcodes,prices,positions,strategies,volumes,outstandings,exchanges,ids,memos,errorcounts];
 }
 
 function order_delete_(tid){
@@ -70,7 +72,7 @@ function order_delete_(tid){
   var data = status.getDataRange().getValues();
   for(var i=0;i<data.length;i++){
     if(data[i][8] === tid){
-      status.deleteRows(i+1);
+      status.deleteRow(i+1);
       return;
     }
   }

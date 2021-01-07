@@ -27,7 +27,8 @@ function hamsterlimit_(){
     var outstanding = Number(result[6][i]);  
     var exchange = result[7][i];
     var tid = result[8][i];
-    var errorcount = Number(result[9][i]);
+    var memo = result[9][i];
+    var errorcount = Number(result[10][i]);
     if(!errorcount || isNaN(errorcount)){
       var errorcount = 0;
     };
@@ -73,20 +74,20 @@ function hamsterlimit_(){
           if(exchange == "bitflyer"){
             var tid0 = tid;
             var outstanding = Number(volume);
-            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type);
+            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }
           }
         }else{
           if(exchange == "bybit" || exchange == "bybit_testnet"){
             var tid0 = tid;
             var outstanding = Number(volume);
-            tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type);
+            tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }
           }
         }
@@ -102,41 +103,44 @@ function hamsterlimit_(){
     var totalvolume,message,memo,response;
     
     try{
-      if(ordStatus == "ACTIVE" || ordStatus == "REJECTED"  || ordStatus == "EXPIRED" || ordStatus == "New" || ordStatus == "Rejected" || ordStatus == "Partially Filled" || ordStatus == "Canceled"){
+      if(ordStatus == "ACTIVE" || ordStatus == "REJECTED"  || ordStatus == "EXPIRED" || ordStatus == "CANCELED" || ordStatus == "New" || ordStatus == "Rejected" || ordStatus == "Partially Filled" || ordStatus == "Cancelled"){
         var tid0 = tid;
         if(exchange == "bybit" || exchange == "bybit_testnet"){
           if((ordStatus == "New" || ordStatus == "PartiallyFilled") & outstanding > 0){
-            //bybit_PriceUpdate_(productcode,position,exchange,tid);
             return;
           }else if(ordStatus == "Rejected"){
-            tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type);
+            tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }
+          }else if(ordStatus == "Cancelled"){
+            order_delete_(tid0);
           }
         }else if(exchange == "bitflyer"){
           if(ordStatus == "ACTIVE"){
             return;
           }else if(ordStatus == "EXPIRED" & outstanding > 0){
-            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type);
+            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }
           }else if(ordStatus == "REJECTED"){
-            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type);
+            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }        
+          }else if(ordStatus == "CANCELED"){
+            order_delete_(tid0);
           }
         }
       }else if(ordStatus == "COMPLETED" || ordStatus == "Filled"){
         order_delete_(tid);
-        price = 0;
         
-        [totalvolume,time] = history_insert_(time,productcode,price,position,strategy,volume,exchange,tid);
+        // historyUpdater で更新できるように price には null を入れておく
+        [totalvolume,time] = history_insert_(time,productcode,null,position,strategy,volume,exchange,tid);
         
         if(exchange=="bitflyer"){
           totalvolume = Number(totalvolume).toFixed(4);
@@ -145,9 +149,13 @@ function hamsterlimit_(){
           totalvolume = Number(totalvolume).toFixed(0);
           volume = Number(volume).toFixed(0);
         }
-        message = "===================\nTime:" + time + "\nStrategy:" + strategy + "\nPosition:" + position + "\nVolume:" + volume + "\nExchange:" + exchange + "\norder_type:" + order_type + "\ntotalVolume:" + totalvolume;
+        message = "===================\nTime:" + time + "\nStrategy:" + strategy + "\nPosition:" + position + "\nVolume:" + volume + "\nMemo:" + memo + "\nExchange:" + exchange + "\norder_type:" + order_type + "\ntotalVolume:" + totalvolume;
         sendMessage_(message);
         error_reset_(strategy,exchange);
+      }else if(!ordStatus && exchange == "bitflyer"){
+        // bitflyerは約定せずキャンセルしたリクエストはgetchildordersで取得できなくなる
+        // 部分的に約定したリクエストはCANCELEDのステータスで取得できる
+        order_delete_(tid);
       }else{
         errorcount = Number(errorcount) + 1;
         if(errorcount >= errorcount_upperlimit){
@@ -156,18 +164,18 @@ function hamsterlimit_(){
           if(exchange == "bitflyer"){
             var tid0 = tid;
             var outstanding = Number(volume);
-            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type);
+            tid = bitflyer_sendOrder_(productcode,position,outstanding,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }
           }else if(exchange == "bybit" || exchange == "bybit_testnet"){
             var tid0 = tid;
             var outstanding = Number(volume);
-            tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type);
+            tid = bybit_sendOrder_(productcode,position,outstanding,exchange,order_type,price);
             if(tid){
               order_delete_(tid0);
-              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid);
+              order_insert_(time,productcode,price,position,strategy,volume,outstanding,exchange,tid,memo);
             }
           }
         }else{
