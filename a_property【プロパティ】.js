@@ -30,7 +30,7 @@ var bybit_minimumVolume = 1.0;
 
 // checkExchangePositions settings
 var checkExchangePositionsSettings = {
-  'bybit': {'BTCUSD': false, 'ETHUSD': false, 'EOSUSD': false, 'XRPUSD': false},
-  'bybit_testnet': {'BTCUSD': false, 'ETHUSD': false, 'EOSUSD': false, 'XRPUSD': false},
+  'bybit': {'BTCUSD': false,'BTCUSDM21': false, 'ETHUSD': false, 'EOSUSD': false, 'XRPUSD': false,'BTCUSDT': false,'ETHUSDT': false,'LTCUSDT': false,'LINKUSDT': false,'XTZUSDT': false,'BCHUSDT': false},
+  'bybit_testnet': {'BTCUSD': false,'BTCUSDM21': false, 'ETHUSD': false, 'EOSUSD': false, 'XRPUSD': false,'BTCUSDT': false,'ETHUSDT': false,'LTCUSDT': false,'LINKUSDT': false,'XTZUSDT': false,'BCHUSDT': false},
   'bitflyer': {'BTC_JPY': false, 'FX_BTC_JPY': false, 'ETH_BTC': false, 'BCH_BTC': false}
 };

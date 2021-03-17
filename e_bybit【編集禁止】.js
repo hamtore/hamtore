@@ -1,7 +1,15 @@
 function bybit_sendOrder_(productcode,position,volume,exchange,order_type,limitprice){
   var timestamp = Date.now().toString();
   var method = 'POST';
-  var path = '/v2/private/order/create';
+  
+  var path;
+  if(productcode.match('USDT')){
+    path = '/private/linear/order/create';
+  }else if(productcode.match('BTCUSDM')){
+    path = '/futures/private/order/create';  
+  }else{
+    path = '/v2/private/order/create';
+  }
 
   if(exchange == "bybit"){
     key = bybit_key;
@@ -93,7 +101,14 @@ function bybit_getPrice_(productcode,position,exchange){
   
   var timestamp = Math.floor(new Date().getTime() / 1000) - 60;
   var method = 'GET';
-  var path = '/v2/public/tickers';
+  var path;
+  if(productcode.match('USDT')){
+    path = '/public/linear/recent-trading-records';
+  }else if(productcode.match('BTCUSDM')){
+    path = '/v2/public/tickers';  
+  }else{
+    path = '/v2/public/tickers';
+  }
   var param_str = "symbol=" + productcode.toUpperCase();
   
   if(exchange == "bybit_testnet"){
@@ -132,7 +147,14 @@ function bybit_getOrder_(order_id,productcode,exchange,position){
 
   var timestamp = Date.now().toString();
   var method = 'GET';
-  var path = '/v2/private/order';
+  var path;
+  if(productcode.match('USDT')){
+    path = '/private/linear/order/list';
+  }else if(productcode.match('BTCUSDM')){
+    path = '/futures/private/order/list';  
+  }else{
+    path = '/v2/private/order';
+  }
   var param_str = "api_key=" + key + "&order_id=" + order_id + "&symbol=" + productcode + "&timestamp=" + timestamp;
 
   var signature = Utilities.computeHmacSha256Signature(param_str, secret);
@@ -175,8 +197,14 @@ function bybit_Cancel_(order_id,productcode,exchange){
 
   var timestamp = Date.now().toString();
   var method = 'POST';
-  var path = '/v2/private/order/cancel';
-
+  var path;
+  if(productcode.match('USDT')){
+    path = '/private/linear/order/cancel';
+  }else if(productcode.match('BTCUSDM')){
+    path = '/futures/private/order/cancel';  
+  }else{
+    path = '/v2/private/order/cancel';
+  }
   var param_str = "api_key=" + key + "&order_id=" + order_id + "&symbol=" + productcode + "&timestamp=" + timestamp;
   var signature = Utilities.computeHmacSha256Signature(param_str, secret);
   var sign = signature.reduce(function(str,chr){
@@ -220,7 +248,15 @@ function bybit_getTime_(exchange,productcode,order_id){
 
   var timestamp = Date.now().toString();
   var method = 'GET';
-  var path = '/v2/private/order';
+  var path;
+  if(productcode.match('USDT')){
+    path = '/private/linear/order/search';
+  }else if(productcode.match('BTCUSDM')){
+    path = '/futures/private/order';  
+  }else{
+    path = '/v2/private/order';
+  }
+
   var param_str = "api_key=" + key + "&order_id=" + order_id + "&symbol=" + productcode + "&timestamp=" + timestamp;
 
   var signature = Utilities.computeHmacSha256Signature(param_str, secret);
@@ -291,7 +327,15 @@ function bybit_getPositions_(exchange, productcode){
 
   var timestamp = Date.now().toString();
   var method = 'GET';
-  var path = '/v2/private/position/list';
+  var path;
+  if(productcode.match('USDT')){
+    path = '/private/linear/position/list';
+  }else if(productcode.match('BTCUSDM')){
+    path = '/futures/private/position/list';  
+  }else{
+    path = '/v2/private/position/list';
+  }
+
   var param_str = "api_key=" + key + "&symbol=" + productcode + "&timestamp=" + timestamp;
 
   var signature = Utilities.computeHmacSha256Signature(param_str, secret);

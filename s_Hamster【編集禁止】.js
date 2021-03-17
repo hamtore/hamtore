@@ -117,7 +117,7 @@ function createOrder_(strategy, position, leverage, memo, position_size, limitpr
     active = status[1]; //ON or OFF
     productcode = status[2];
     raw_volume = Number(status[3]);
-    volume = raw_volume * Number(leverage); //bitflyerの場合0.01BTC以上、bybitの場合0.0025BTC以上
+    volume = raw_volume * Number(leverage); //bitflyerの場合0.001BTC以上、bybitの場合0.0025BTC以上
     todoubles = status[5];
     exchange = status[6];
     order_type = status[7];
@@ -188,8 +188,8 @@ function createOrder_(strategy, position, leverage, memo, position_size, limitpr
             return Status.skip;
           }
         }
-        if(volume<0.01){
-          volume = 0.01;
+        if(volume<0.001){
+          volume = 0.001;
         }
         
         tid = bitflyer_sendOrder_(productcode,position,volume,order_type,limitprice);
